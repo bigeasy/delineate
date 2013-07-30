@@ -27,37 +27,58 @@ function getSeeds(entries) {
   return new Array(entries[seed1], entries[seed2])
 }
 
-function distToGroup(entries) {
+function distToGroup(entries, groups) {
   //Using pickNext(), give each entry
   //to the group that would have to grow
   //_least_ to accomodate it
   //If groups tie, choose by:
   //smallest area > fewest entries > either one
-}
+  var i group1diff, group2diff, temp
 
-function pickNext(entries, groups) {
-  //Takes all entries not yet grouped,
-  //find the amount both groups would have
-  //to grow to include that entry,
-  //return entry with max diff between group growths
-  var i, diff = 0, maxdiff = 0, pick = 0
-  for (i = 0; i < entries.length; i++) {
-    //Find out how much each group would have to grow
-    diff = comp(entries[i])
-    if (diff > maxdiff) {
-      maxdiff = diff
-      pick = i
+  for (i=0; i < entries.length; i++) {
+    temp = entries[pickNext(entries, groups)]
+    group1diff = temp.length - groups[0].length *
+      temp.width - groups[0].width
+    group2diff = temp.length - groups[1].length *
+      temp.width - groups[1].width
+    if (group1diff > group2diff) {
+      //place temp in group[1]
+    }
+    else if (group2diff > group1diff) {
+      //place temp in group[0]
+    }
+    else {
+      //place in group with smallest area
+      //if tie, place in group with fewest entries
+      //if tie, does not matter
     }
   }
 
-  return entries[pick]
+  function pickNext(entries, groups) {
+    //Takes all entries not yet grouped,
+    //find the amount both groups would have
+    //to grow to include that entry,
+    //return entry with max diff between group growths
+    var i, diff = 0, maxdiff = 0, pick = 0
+    for (i = 0; i < entries.length; i++) {
+      //Find diff of much each group would have to grow
+      diff = growth(entries[i])
+      if (diff > maxdiff) {
+        maxdiff = diff
+        pick = i
+      }
+    }
 
-  function comp (entry) {
-    var a1 = entry.length - groups[0].length *
-      entry.height - group[0].height,
-      a2 = entry.length - groups[1].length *
-      entry.height - group[1].height
-    return Math.abs(a1 - a2)
+    return pick
+
+    function growth (entry) {
+    // growth diff
+      var a1 = entry.length - groups[0].length *
+        entry.height - group[0].height,
+        a2 = entry.length - groups[1].length *
+        entry.height - group[1].height
+      return Math.abs(a1 - a2)
+    }
   }
 }
 
