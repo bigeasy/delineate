@@ -3,7 +3,7 @@ exports.mbr = function (rect) {
 }
 
 function getSeeds(entries) {
-  var i, j, rect, height, width,
+  var i, j, height, width,
     area = 0, d,
     seed1, seed2
 
@@ -35,11 +35,30 @@ function distToGroup(entries) {
   //smallest area > fewest entries > either one
 }
 
-function pickNext(entries) {
+function pickNext(entries, groups) {
   //Takes all entries not yet grouped,
   //find the amount both groups would have
   //to grow to include that entry,
-  //return entry with max diff between group growth
+  //return entry with max diff between group growths
+  var i, diff = 0, maxdiff = 0, pick = 0
+  for (i = 0; i < entries.length; i++) {
+    //Find out how much each group would have to grow
+    diff = comp(entries[i])
+    if (diff > maxdiff) {
+      maxdiff = diff
+      pick = i
+    }
+  }
+
+  return entries[pick]
+
+  function comp (entry) {
+    var a1 = entry.length - groups[0].length *
+      entry.height - group[0].height,
+      a2 = entry.length - groups[1].length *
+      entry.height - group[1].height
+    return Math.abs(a1 - a2)
+  }
 }
 
 function Rectangle(width, height) {
