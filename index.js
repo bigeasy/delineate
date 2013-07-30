@@ -1,7 +1,3 @@
-exports.mbr = function (rect) {
-    return rect
-}
-
 function getSeeds(entries) {
   var i, j, height, width,
     area = 0, d,
