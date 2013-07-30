@@ -12,8 +12,8 @@ function getSeeds(entries) {
     for (i = j+1; i < entries.length) {
       //check for best pair
       //using area of rectangle containing each pair
-      height = entries[i].height > entries[j].height ? entries[i].height : entries[j].height
       width = entries[i].width > entries[j].width ? entries[i].width : entries[j].width
+      height = entries[i].height > entries[j].height ? entries[i].height : entries[j].height
       d = (height * width) - entries[i].area - entries[j].area
 
       if (d > area) {
@@ -37,10 +37,10 @@ function distToGroup(entries, groups) {
 
   for (i=0; i < entries.length; i++) {
     temp = entries[pickNext(entries, groups)]
-    group1diff = temp.length - groups[0].length *
-      temp.width - groups[0].width
-    group2diff = temp.length - groups[1].length *
-      temp.width - groups[1].width
+    group1diff = temp.width - groups[0].width *
+      temp.height - groups[0].height
+    group2diff = temp.width - groups[1].width *
+      temp.height - groups[1].height
     if (group1diff > group2diff) {
       //place temp in group[1]
     }
@@ -73,9 +73,9 @@ function distToGroup(entries, groups) {
 
     function growth (entry) {
     // growth diff
-      var a1 = entry.length - groups[0].length *
+      var a1 = entry.width - groups[0].width *
         entry.height - group[0].height,
-        a2 = entry.length - groups[1].length *
+        a2 = entry.width - groups[1].width *
         entry.height - group[1].height
       return Math.abs(a1 - a2)
     }
