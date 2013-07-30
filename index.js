@@ -1,11 +1,10 @@
 function getSeeds(entries) {
-    var i, j, height, width,
-        area = 0, d,
-        seed1, seed2
+    var area = 0
+    var d, i, j, height, width, seed1, seed2
 
     //Get all unique pairs
     for (j = 0; j < entries.length - 1; j++) {
-        for (i = j+1; i < entries.length) {
+        for (i = j + 1; i < entries.length;) {
             //check for best pair
             //using area of rectangle containing each pair
             width = entries[i].width > entries[j].width ? entries[i].width : entries[j].width
@@ -17,7 +16,7 @@ function getSeeds(entries) {
                 seed1 = i
                 seed2 = j
             }
-            i = j+1
+            i = j + 1
         }
     }
     return new Array(entries[seed1], entries[seed2])
@@ -29,7 +28,7 @@ function distToGroup(entries, groups) {
     //_least_ to accomodate it
     //If groups tie, choose by:
     //smallest area > fewest entries > either one
-    var i group1diff, group2diff, temp
+    var i, group1diff, group2diff, temp
 
     for (i=0; i < entries.length; i++) {
         temp = entries[pickNext(entries, groups)]
