@@ -37,34 +37,34 @@ function distToGroup (rectified, left, right) {
     var i, leftDiff, rightDiff, temp
 
     while (rectified.length) {
-        temp = rectified.splice(pickNext(), 1)
-        leftDiff = left.rect.combine(temp[0].rect).area - left.rect.area
-        rightDiff = right.rect.combine(temp[0].rect).area - right.rect.area
+        temp = rectified.splice(pickNext(), 1).pop()
+        leftDiff = left.rect.combine(temp.rect).area - left.rect.area
+        rightDiff = right.rect.combine(temp.rect).area - right.rect.area
         if (leftDiff > rightDiff) {
-            if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
-            right.records.push(temp[0].record)
+            right.rect = right.rect.combine(temp.rect)
+            right.records.push(temp.record)
         } else if (rightDiff > leftDiff) {
-            if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
-            left.records.push(temp[0].record)
+            left.rect = left.rect.combine(temp.rect)
+            left.records.push(temp.record)
         } else {
             // do you have have to grow the rectangles here? Yes!
             //place in group with smallest area
             if (left.rect.area > right.rect.area) {
-                if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
-                right.records.push(temp[0].record)
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
             }
             else if (right.rect.area > left.rect.area) {
-                if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
-                left.records.push(temp[0].record)
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
             }
             //if tie, place in group with fewest records
             else if (left.records.length > right.records.length) {
-                if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
-                right.records.push(temp[0].record)
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
             }
             else {
-                if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
-                left.records.push(temp[0].record)
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
                 //if tie, does not matter
             }
         }
@@ -91,13 +91,6 @@ function distToGroup (rectified, left, right) {
         }
 
         return pick
-    }
-
-    function within (rect1, rect2) {
-        return (rect2.x > rect1.x &&
-            rect2.x < rect1.right &&
-            rect2.y > rect1.y &&
-            rect2.y < rect1.right)
     }
 }
 
