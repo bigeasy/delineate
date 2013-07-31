@@ -122,9 +122,6 @@ Rectangle.prototype.combine = function (other) {
 }
 
 exports.partition = function (records) {
-    console.log(records)
-    //throw new Error('get back to me later')
-    //
     var rectified = records.map(function (record) {
         var x = +(record.x)
         var y = +(record.y)
@@ -134,12 +131,10 @@ exports.partition = function (records) {
         }
     })
 
-    console.log(rectified)
     return split(rectified)
 
     function split (rectified) {
         var seeds = getSeeds(rectified)
-        console.log(seeds)
         seeds.sort()
         var right = { rect: rectified[seeds[1]].rect }
         right.records = [ rectified.splice(seeds[1], 1)[0].record ]
