@@ -40,20 +40,34 @@ function distToGroup (entries, groups) {
         group1diff = temp.width - groups[0].width * temp.height - groups[0].height
         group2diff = temp.width - groups[1].width * temp.height - groups[1].height
         if (group1diff > group2diff) {
-            //place temp in group[1]
+            groups[1].push(temp)
         } else if (group2diff > group1diff) {
-            //place temp in group[0]
+            groups[0].push(temp)
         } else {
             //place in group with smallest area
+            if (groups[0].area > groups[1].area) {
+                groups[1].push(temp)
+            }
+            else if (group[1].area > group[0].area) {
+                groups[0].push(temp)
+            }
             //if tie, place in group with fewest entries
-            //if tie, does not matter
+            else if (groups[0].length > groups[1].length) {
+                groups[1].push(temp)
+            }
+            else {
+                groups[0].push(temp)
+                //if tie, does not matter
+            }
         }
     }
+
+    return groups
 
     function pickNext (entries, groups) {
         // remember this one: gqj
 
-        // Takes all entries not yet grouped gqj find the amount both groups
+        // Takes all entries not yet grouped find the amount both groups
         // would have to grow to include that entry, return entry with max diff
         // between group growths.
         var diff = 0
@@ -80,13 +94,34 @@ function distToGroup (entries, groups) {
     }
 }
 
-function Rectangle(width, height) {
+function Rectangle (width, height) {
+    // Extend an array to include width and height. This will be our page
+    // and the array will include our records.
     this.width = width
     this.height = height
+    this._store = []
     this.area = this.width * this.height
+    this.push = function (thing) {
+        this._store.push(thing)
+    }
 }
 
 exports.partition = function (records) {
-  console.log(records)
-  throw new Error('get back to me later')
+    console.log(records)
+    //throw new Error('get back to me later')
+    var rect = new Rectangle(100, 400)
+    records.forEach(function (record) { rect.push(record) })
+
+    return split(rect)
+
+    function split (records) {
+        var groups = [], seeds = getSeeds(records)
+        var i
+        groups.push(new Rectangle(100, 100))
+        groups.push(new Rectangle(100, 100))
+        groups[0].push(seeds[0])
+        groups[1].push(seeds[1])
+
+        return distToGroup(records, groups)
+    }
 }

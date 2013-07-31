@@ -18,7 +18,8 @@ require('proof')(1, function (step, equal, say) {
             var points = $[1].split(/,/)
             records.push({
                 place: $[2],
-                x: points[1], y: points[0]
+                x: points[1], y: points[0],
+                area: points[1] * points[0]
             })
         })
         var split = partition(records)
