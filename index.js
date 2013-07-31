@@ -85,3 +85,8 @@ function Rectangle(width, height) {
     this.height = height
     this.area = this.width * this.height
 }
+
+exports.partition = function (records) {
+  console.log(records)
+  throw new Error('get back to me later')
+}
