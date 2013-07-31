@@ -1,3 +1,5 @@
+var ok = require('assert').ok
+
 // We need to transform a strata page into an array or records. Ulimately, we
 // might operate on a page directly, but it is easier to test this algorithm if
 // it has been transformed into something specific to the algorithm. You can
@@ -5,123 +7,153 @@
 // the end user, so it's on you to transform that into an array of partitioning
 // records. In each record, tuck your key. When you get the records back,
 // grouped into pages, you split your page based on the keys in those records.
-
+//
+// There must be at least two rectangles in the collection.
+//
 // Determine which pair would require the biggest rectangle to enclose them.
-function getSeeds (records) {
-    var area = 0
-    var d, i, j, height, width, seed1, seed2
+function getSeeds (rectified) {
+    var candidate = new Rectangle(0, 0, 0, 0)
+    var i, j, seed1, seed2
 
     // For all unique pairs.
-    for (j = 0; j < records.length - 1; j++) {
-        for (i = j + 1; i < records.length;) {
-            width = records[i].width > records[j].width ? records[i].width : records[j].width
-            height = records[i].height > records[j].height ? records[i].height : records[j].height
-            d = (height * width) - records[i].area - records[j].area
-
-            if (d > area) {
-                area = d
+    for (j = 0; j < rectified.length; j++) {
+        for (i = 0; i < rectified.length; i++) {
+            if (i == j) continue
+            var combination = rectified[i].rect.combine(rectified[j].rect)
+            if (combination.area > candidate.area) {
+                candidate = combination
                 seed1 = i
                 seed2 = j
             }
-            i = j + 1
         }
     }
-    return [ records[seed1], records[seed2] ]
+    return [ seed1, seed2 ]
 }
 
-function distToGroup (entries, groups) {
+function distToGroup (rectified, left, right) {
     // Using pickNext(), give each entry to the group that would have to grow
     // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
-    // entries > either one
-    var i, group1diff, group2diff, temp
+    // rectified > either one
+    var i, leftDiff, rightDiff, temp
 
-    for (i = 0; i < entries.length; i++) {
-        temp = entries[pickNext(entries, groups)]
-        group1diff = temp.width - groups[0].width * temp.height - groups[0].height
-        group2diff = temp.width - groups[1].width * temp.height - groups[1].height
-        if (group1diff > group2diff) {
-            groups[1].push(temp)
-        } else if (group2diff > group1diff) {
-            groups[0].push(temp)
+    while (rectified.length) {
+        temp = rectified.splice(pickNext(), 1)
+        leftDiff = left.rect.combine(temp[0].rect).area - left.rect.area
+        rightDiff = right.rect.combine(temp[0].rect).area - right.rect.area
+        if (leftDiff > rightDiff) {
+            if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
+            right.records.push(temp[0].record)
+        } else if (rightDiff > leftDiff) {
+            if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
+            left.records.push(temp[0].record)
         } else {
+            // do you have have to grow the rectangles here? Yes!
             //place in group with smallest area
-            if (groups[0].area > groups[1].area) {
-                groups[1].push(temp)
+            if (left.rect.area > right.rect.area) {
+                if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
+                right.records.push(temp[0].record)
             }
-            else if (group[1].area > group[0].area) {
-                groups[0].push(temp)
+            else if (right.rect.area > left.rect.area) {
+                if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
+                left.records.push(temp[0].record)
             }
-            //if tie, place in group with fewest entries
-            else if (groups[0].length > groups[1].length) {
-                groups[1].push(temp)
+            //if tie, place in group with fewest records
+            else if (left.records.length > right.records.length) {
+                if (within(right.rect, temp[0].rect)) right.rect = right.rect.combine(temp[0].rect)
+                right.records.push(temp[0].record)
             }
             else {
-                groups[0].push(temp)
+                if (within(left.rect, temp[0].rect)) left.rect = left.rect.combine(temp[0].rect)
+                left.records.push(temp[0].record)
                 //if tie, does not matter
             }
         }
     }
 
-    return groups
+    return [ left, right ]
 
-    function pickNext (entries, groups) {
+    function pickNext () {
         // remember this one: gqj
 
-        // Takes all entries not yet grouped find the amount both groups
-        // would have to grow to include that entry, return entry with max diff
+        // Takes all records not yet grouped find the amount both groups would
+        // have to grow to include that entry, return entry with max diff
         // between group growths.
-        var diff = 0
-        var maxdiff = 0
+        var candidate = 0
         var pick = 0
-        var i
-        for (i = 0; i < entries.length; i++) {
-            // Find diff of much each group would have to grow.
-            diff = growth(entries[i])
-            if (diff > maxdiff) {
-                maxdiff = diff
+        for (var i = 0; i < rectified.length; i++) {
+            var leftArea = left.rect.combine(rectified[i].rect).area
+            var rightArea = right.rect.combine(rectified[i].rect).area
+            var difference = Math.abs(leftArea - rightArea)
+            if (difference > candidate) {
+                candidate = difference
                 pick = i
             }
         }
 
         return pick
+    }
 
-        function growth (entry) {
-        // growth diff
-            var a1 = entry.width - groups[0].width * entry.height - group[0].height
-            var a2 = entry.width - groups[1].width * entry.height - group[1].height
-            return Math.abs(a1 - a2)
-        }
+    function within (rect1, rect2) {
+        return (rect2.x > rect1.x &&
+            rect2.x < rect1.right &&
+            rect2.y > rect1.y &&
+            rect2.y < rect1.right)
     }
 }
 
-function Rectangle (width, height) {
-    // Extend an array to include width and height. This will be our page
-    // and the array will include our records.
-    this.width = width
-    this.height = height
-    this._store = []
+function Rectangle (x, y, bottom, right) {
+    ok(x <= right, 'x <= right')
+    ok(bottom <= y, 'bottom <= y')
+    // Extend an array to include width and height. This will be our page and
+    // the array will include our records.
+    this.x = x
+    this.y = y
+    this.bottom = bottom
+    this.right = right
+    this.height = this.y - bottom
+    this.width = right - this.x
     this.area = this.width * this.height
-    this.push = function (thing) {
-        this._store.push(thing)
-    }
+}
+Rectangle.prototype.combine = function (other) {
+    ok(other instanceof Rectangle, 'other instanceof Rectangle')
+    var x = Math.min(this.x, other.x)
+    var y = Math.max(this.y, other.y)
+
+    // The following lines will not work, since we are
+    // not receiving rectangles. Will need to recalculate
+    // bottom and right.
+    //
+    var bottom = Math.min(this.bottom, other.bottom)
+    var right = Math.max(this.right, other.right)
+    return new Rectangle(x, y, bottom, right)
 }
 
 exports.partition = function (records) {
     console.log(records)
     //throw new Error('get back to me later')
-    var rect = new Rectangle(100, 400)
-    records.forEach(function (record) { rect.push(record) })
+    //
+    var rectified = records.map(function (record) {
+        var x = +(record.x)
+        var y = +(record.y)
+        return {
+            rect: new Rectangle(x, y, y, x),
+            record: record
+        }
+    })
 
-    return split(rect)
+    console.log(rectified)
+    return split(rectified)
 
-    function split (records) {
-        var groups = [], seeds = getSeeds(records)
-        var i
-        groups.push(new Rectangle(100, 100))
-        groups.push(new Rectangle(100, 100))
-        groups[0].push(seeds[0])
-        groups[1].push(seeds[1])
+    function split (rectified) {
+        var seeds = getSeeds(rectified)
+        console.log(seeds)
+        seeds.sort()
+        var right = { rect: rectified[seeds[1]].rect }
+        right.records = [ rectified.splice(seeds[1], 1)[0].record ]
 
-        return distToGroup(records, groups)
+        var left = { rect: rectified[seeds[0]].rect }
+        left.records = [ rectified.splice(seeds[0], 1)[0].record ]
+
+        return distToGroup(rectified, left, right)
     }
 }
