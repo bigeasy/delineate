@@ -1,4 +1,4 @@
-sources = css/xy.css index.html
+sources = css/r-tree.css index.html
 
 all: $(sources)
 
