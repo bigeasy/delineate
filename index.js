@@ -94,7 +94,7 @@ function distToGroup (rectified, left, right) {
     }
 }
 
-function Rectangle (x, y, bottom, right) {
+function Rectangle (x, y, bottom, right) { // :: Int -> Int -> Int -> Int -> Rectangle
     ok(x <= right, 'x <= right')
     ok(bottom <= y, 'bottom <= y')
     // Extend an array to include width and height. This will be our page and
@@ -107,7 +107,7 @@ function Rectangle (x, y, bottom, right) {
     this.width = right - this.x
     this.area = this.width * this.height
 }
-Rectangle.prototype.combine = function (other) {
+Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     ok(other instanceof Rectangle, 'other instanceof Rectangle')
     var x = Math.min(this.x, other.x)
     var y = Math.max(this.y, other.y)
@@ -119,6 +119,18 @@ Rectangle.prototype.combine = function (other) {
     var bottom = Math.min(this.bottom, other.bottom)
     var right = Math.max(this.right, other.right)
     return new Rectangle(x, y, bottom, right)
+}
+Rectangle.prototype.intersect = function (other) { // :: Rectangle -> Rectangle
+  max_x = Math.max(this.x, other.x)
+  max_y = Math.max(this.y, other.y)
+  min_left = Math.min(this.left, other.left)
+  min_right = Math.min(this.right, other.right)
+  right = min_left - max_x
+  bottom = min_right - max_y
+  if (width < 0 || height < 0) {
+    return null
+  }
+  return new Rectangle(max_x, max_y, bottom, right)
 }
 
 exports.partition = function (records) {
