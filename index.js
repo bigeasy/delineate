@@ -132,6 +132,12 @@ Rectangle.prototype.intersect = function (other) { // :: Rectangle -> Rectangle
   }
   return new Rectangle(max_x, max_y, bottom, right)
 }
+Rectangle.prototype.containsPoint = function (x, y) { // :: Int -> Int -> Bool
+  return (x <= self.x && x >= self.right && y <= self.y && y >= self.bottom)
+}
+Rectangle.prototype.containsRect = function (other) { // :: Rectangle -> Bool
+  return self.containsPoint(other.x, other.y) && self.containsPoint(other.right, other.bottom)
+}
 
 exports.partition = function (records) {
     console.log(records)
