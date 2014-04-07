@@ -121,22 +121,25 @@ Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     return new Rectangle(x, y, bottom, right)
 }
 Rectangle.prototype.intersect = function (other) { // :: Rectangle -> Rectangle
-  max_x = Math.max(this.x, other.x)
-  max_y = Math.max(this.y, other.y)
-  min_left = Math.min(this.left, other.left)
-  min_right = Math.min(this.right, other.right)
-  right = min_left - max_x
-  bottom = min_right - max_y
+  x = Math.max(self.x, other.x)
+  y = Math.min(self.y, other.y)
+  right = Math.min(self.right, other.right)
+  bottom = Math.max(self.bottom, other.bottom)
+  width = right - x
+  height = y - bottom
   if (width < 0 || height < 0) {
     return null
   }
-  return new Rectangle(max_x, max_y, bottom, right)
+  return new Rectangle(x, y, bottom, right)
 }
 Rectangle.prototype.containsPoint = function (x, y) { // :: Int -> Int -> Bool
   return (x <= self.x && x >= self.right && y <= self.y && y >= self.bottom)
 }
 Rectangle.prototype.containsRect = function (other) { // :: Rectangle -> Bool
   return self.containsPoint(other.x, other.y) && self.containsPoint(other.right, other.bottom)
+}
+Rectangle.prototype.overlap = function (other) { // :: Rectangle -> Int
+  return self.intersect(other).area
 }
 
 exports.partition = function (records) {
