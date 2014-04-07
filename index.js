@@ -94,7 +94,7 @@ function distToGroup (rectified, left, right) {
     }
 }
 
-function Rectangle (x, y, bottom, right) {
+function Rectangle (x, y, bottom, right) { // :: Int -> Int -> Int -> Int -> Rectangle
     ok(x <= right, 'x <= right')
     ok(bottom <= y, 'bottom <= y')
     // Extend an array to include width and height. This will be our page and
@@ -107,7 +107,7 @@ function Rectangle (x, y, bottom, right) {
     this.width = right - this.x
     this.area = this.width * this.height
 }
-Rectangle.prototype.combine = function (other) {
+Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     ok(other instanceof Rectangle, 'other instanceof Rectangle')
     var x = Math.min(this.x, other.x)
     var y = Math.max(this.y, other.y)
@@ -119,6 +119,27 @@ Rectangle.prototype.combine = function (other) {
     var bottom = Math.min(this.bottom, other.bottom)
     var right = Math.max(this.right, other.right)
     return new Rectangle(x, y, bottom, right)
+}
+Rectangle.prototype.intersect = function (other) { // :: Rectangle -> Rectangle
+  x = Math.max(self.x, other.x)
+  y = Math.min(self.y, other.y)
+  right = Math.min(self.right, other.right)
+  bottom = Math.max(self.bottom, other.bottom)
+  width = right - x
+  height = y - bottom
+  if (width < 0 || height < 0) {
+    return null
+  }
+  return new Rectangle(x, y, bottom, right)
+}
+Rectangle.prototype.containsPoint = function (x, y) { // :: Int -> Int -> Bool
+  return (x <= self.x && x >= self.right && y <= self.y && y >= self.bottom)
+}
+Rectangle.prototype.containsRect = function (other) { // :: Rectangle -> Bool
+  return self.containsPoint(other.x, other.y) && self.containsPoint(other.right, other.bottom)
+}
+Rectangle.prototype.overlap = function (other) { // :: Rectangle -> Int
+  return self.intersect(other).area
 }
 
 exports.partition = function (records) {
