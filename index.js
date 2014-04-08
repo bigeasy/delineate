@@ -141,6 +141,9 @@ Rectangle.prototype.containsRect = function (other) { // :: Rectangle -> Bool
 Rectangle.prototype.overlap = function (other) { // :: Rectangle -> Int
   return this.intersect(other).area
 }
+Rectangle.prototype.diagonal = function () { // :: -> Int
+  return Math.sqrt(((this.width * this.width) + (this.height * this.height)))
+}
 
 exports.partition = function (records) {
     console.log(records)
