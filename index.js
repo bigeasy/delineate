@@ -11,7 +11,8 @@ var ok = require('assert').ok
 // There must be at least two rectangles in the collection.
 //
 // Determine which pair would require the biggest rectangle to enclose them.
-function getSeeds (rectified) {
+
+function getQuadraticSeeds (rectified) {
     var candidate = new Rectangle(0, 0, 0, 0)
     var i, j, seed1, seed2
 
@@ -28,6 +29,11 @@ function getSeeds (rectified) {
         }
     }
     return [ seed1, seed2 ]
+}
+
+function getLinearSeeds(rectified) {
+  // Check children for two entries with highest and lowest height, record separation
+  // find greatest normalized separation
 }
 
 function distToGroup (rectified, left, right) {
@@ -106,6 +112,7 @@ function Rectangle (x, y, bottom, right) { // :: Int -> Int -> Int -> Int -> Rec
     this.height = this.y - bottom
     this.width = right - this.x
     this.area = this.width * this.height
+    this.children = []
 }
 Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     ok(other instanceof Rectangle, 'other instanceof Rectangle')
@@ -155,10 +162,10 @@ exports.partition = function (records) {
         }
     })
 
-    return split(rectified)
+    return quadraticSplit(rectified)
 
-    function split (rectified) {
-        var seeds = getSeeds(rectified)
+    function quadraticSplit (rectified) {
+        var seeds = getQuadraticSeeds(rectified)
         seeds.sort()
         var right = { rect: rectified[seeds[1]].rect }
         right.records = [ rectified.splice(seeds[1], 1)[0].record ]
@@ -168,4 +175,5 @@ exports.partition = function (records) {
 
         return distToGroup(rectified, left, right)
     }
+
 }
