@@ -32,7 +32,7 @@ function getQuadraticSeeds (rectified) {
 }
 
 function getLinearSeeds(rectified) {
-  // Check children for two entries with highest and lowest height, record separation
+  // Check children for two entries with highest and lowest "high side" along all dimensions, record separation
   // find greatest normalized separation
 }
 
