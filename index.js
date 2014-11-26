@@ -31,11 +31,6 @@ function getQuadraticSeeds (rectified) {
     return [ seed1, seed2 ]
 }
 
-function getLinearSeeds(rectified) {
-  // Check children for two entries with highest and lowest "high side" along all dimensions, record separation
-  // find greatest normalized separation
-}
-
 function distToGroup (rectified, left, right) {
     // Using pickNext(), give each entry to the group that would have to grow
     // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
