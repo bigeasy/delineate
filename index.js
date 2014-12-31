@@ -147,7 +147,7 @@ Rectangle.prototype.diagonal = function () { // :: -> Int
   return Math.sqrt(((this.width * this.width) + (this.height * this.height)))
 }
 
-exports.partition = function (records) {
+exports.quadraticPartition = function (records) {
     var rectified = records.map(function (record) {
         var x = +(record.x)
         var y = +(record.y)
