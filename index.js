@@ -31,7 +31,7 @@ function getQuadraticSeeds (rectified) {
     return [ seed1, seed2 ]
 }
 
-function distToGroup (rectified, left, right) {
+function distToGroupQuad (rectified, left, right) {
     // Using pickNext(), give each entry to the group that would have to grow
     // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
     // rectified > either one
@@ -168,7 +168,33 @@ exports.quadraticPartition = function (records) {
         var left = { rect: rectified[seeds[0]].rect }
         left.records = [ rectified.splice(seeds[0], 1)[0].record ]
 
-        return distToGroup(rectified, left, right)
+        return distToGroupQuad(rectified, left, right)
+    }
+
+}
+
+exports.linearPartition = function (records) {
+    var rectified = records.map(function (record) {
+        var x = +(record.x)
+        var y = +(record.y)
+        return {
+            rect: new Rectangle(x, y, y, x),
+            record: record
+        }
+    })
+
+    return linearSplit(rectified)
+
+    function linearSplit (rectified) {
+        var seeds = getlinearSeeds(rectified)
+        seeds.sort()
+        var right = { rect: rectified[seeds[1]].rect }
+        right.records = [ rectified.splice(seeds[1], 1)[0].record ]
+
+        var left = { rect: rectified[seeds[0]].rect }
+        left.records = [ rectified.splice(seeds[0], 1)[0].record ]
+
+        return distToGroupLin(rectified, left, right)
     }
 
 }
