@@ -8,9 +8,60 @@ var ok = require('assert').ok
 // records. In each record, tuck your key. When you get the records back,
 // grouped into pages, you split your page based on the keys in those records.
 //
-// There must be at least two rectangles in the collection.
+// There must be at least two rectangles in the collection. Below we provide
+// a quadratic and linear cost split.
 //
-// Determine which pair would require the biggest rectangle to enclose them.
+
+// function getLinearSeeds (rectified)
+
+// This code vvv  may need to be refactored.
+
+function distToGroupLin (rectified, left, right) {
+    // Using pickNext(), give each entry to the group that would have to grow
+    // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
+    // rectified > either one
+    var i, leftDiff, rightDiff, temp
+
+    while (rectified.length) {
+        temp = rectified.pop()
+        leftDiff = left.rect.combine(temp.rect).area - left.rect.area
+        rightDiff = right.rect.combine(temp.rect).area - right.rect.area
+        if (leftDiff > rightDiff) {
+            right.rect = right.rect.combine(temp.rect)
+            right.records.push(temp.record)
+        } else if (rightDiff > leftDiff) {
+            left.rect = left.rect.combine(temp.rect)
+            left.records.push(temp.record)
+        } else {
+            // do you have have to grow the rectangles here? Yes!
+            //place in group with smallest area
+            if (left.rect.area > right.rect.area) {
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
+            }
+            else if (right.rect.area > left.rect.area) {
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
+            }
+            //if tie, place in group with fewest records
+            else if (left.records.length > right.records.length) {
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
+            }
+            else {
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
+                //if tie, does not matter
+            }
+        }
+    }
+
+    return [ left, right ]
+}
+
+
+// The quadratic split determines which pair would require the biggest
+// rectangle to enclose them.
 
 function getQuadraticSeeds (rectified) {
     var candidate = new Rectangle(0, 0, 0, 0)
