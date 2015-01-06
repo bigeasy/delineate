@@ -125,8 +125,6 @@ function distToGroupQuad (rectified, left, right) {
     return [ left, right ]
 
     function pickNext () {
-        // remember this one: gqj
-
         // Takes all records not yet grouped find the amount both groups would
         // have to grow to include that entry, return entry with max diff
         // between group growths.
@@ -164,11 +162,6 @@ Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     ok(other instanceof Rectangle, 'other instanceof Rectangle')
     var x = Math.min(this.x, other.x)
     var y = Math.max(this.y, other.y)
-
-    // The following lines will not work, since we are
-    // not receiving rectangles. Will need to recalculate
-    // bottom and right.
-    //
     var bottom = Math.min(this.bottom, other.bottom)
     var right = Math.max(this.right, other.right)
     return new Rectangle(x, y, bottom, right)
