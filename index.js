@@ -12,7 +12,76 @@ var ok = require('assert').ok
 // a quadratic and linear cost split.
 //
 
-// function getLinearSeeds (rectified)
+
+function getLinearSeeds (rectified) {
+    var temp
+    var j = 0
+    var x1_high, x2_high, x1_low, x2_low
+    var y1_high, y2_high, y1_low, y2_low
+    var seedX1, seedX2, seedY1, seedY2
+
+    // Assign first set of points for conditionals.
+    x1_high = x1_low = x2_high = x2_low = rectified[j].record.x
+    y1_high = y1_low = y2_high = y2_low = rectified[j].record.y
+    seedX1 = seedX2 = seedY1 = seedY2 = 0
+
+    // Find first and second outer most point along each dimension
+    for (j = 1; j < rectified.length; j++) {
+
+        // Find first and second outer most point along each dimension
+        // How can this be refactored?
+        if (rectified[j].record.x > x2_high) {
+            if (rectified[j].record.x > x1_high) {
+                x2_high = x1_high
+                x1_high = rectified[j].record.x
+                seedX1 = j
+            } else {
+                x2_high = rectified[j].record.x
+            }
+        }
+
+        if (rectified[j].record.x < x2_low) {
+            if (rectified[j].record.x > x1_low) {
+                x2_low = rectified[j].record.x
+            } else {
+                x2_low = x1_low
+                x1_low = rectified[j].record.x
+                seedX2 = j
+            }
+        }
+
+        if (rectified[j].record.y > y2_high) {
+            if (rectified[j].record.y > y1_high) {
+                y2_high = y1_high
+                y1_high = rectified[j].record.y
+                seedY1 = j
+            } else {
+                y2_high = rectified[j].record.y
+            }
+        }
+
+        if (rectified[j].record.y < y2_low) {
+            if (rectified[j].record.y > y1_low) {
+                y2_low = rectified[j].record.y
+            } else {
+                y2_low = y1_low
+                y1_low = rectified[j].record.y
+                seedY2 = j
+            }
+        }
+    }
+
+    // Get the normalized seperations
+    var normalizedY = (y2_high - y2_low)/(y1_high - y1_low)
+    var normalizedX = (x2_high - x2_low)/(x1_high - x1_low)
+
+    // Return seeds
+    if (normalizedX > normalizedY) {
+        return [ seedX1, seedX2 ]
+    } else {
+        return [ seedY1, seedY2 ]
+    }
+}
 
 // This code vvv  may need to be refactored.
 
@@ -237,7 +306,7 @@ exports.linearPartition = function (records) {
     return linearSplit(rectified)
 
     function linearSplit (rectified) {
-        var seeds = getlinearSeeds(rectified)
+        var seeds = getLinearSeeds(rectified)
         seeds.sort()
         var right = { rect: rectified[seeds[1]].rect }
         right.records = [ rectified.splice(seeds[1], 1)[0].record ]
