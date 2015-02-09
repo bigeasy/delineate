@@ -7,12 +7,12 @@
     [
                         "btree", "database", "json", "b-tree", "r-tree", "spatial"
     ],
-    "homepage":         "https://github.com/bigeasy/r-tree",
-    "bugs":             "https://github.com/bigeasy/r-tree/issues",
+    "homepage":         "https://github.com/bigeasy/delineate",
+    "bugs":             "https://github.com/bigeasy/delineate/issues",
     "repository":
     {
                         "type": "git",
-                        "url": "http://github.com/bigeasy/r-tree.git"
+                        "url": "http://github.com/bigeasy/delineate.git"
     },
     "contributors":
     [{
@@ -27,7 +27,7 @@
     "licenses":
     [{
                         "type": "MIT",
-                        "url": "http://github.com/bigeasy/r-tree/raw/master/LICENSE"
+                        "url": "http://github.com/bigeasy/delineate/raw/master/LICENSE"
     }],
     "scripts": {
         "test": "proof platform win32 && proof test */*/*.t.js || t/test"
