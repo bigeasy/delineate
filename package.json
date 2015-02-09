@@ -1,6 +1,6 @@
 {
-    "name":             "r-tree",
-    "version":          "0.0.0",
+    "name":             "delineate",
+    "version":          "0.0.1",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
     "description":      "An R-Tree partition algorithm.",
     "keywords":
