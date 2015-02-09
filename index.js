@@ -8,9 +8,109 @@ var ok = require('assert').ok
 // records. In each record, tuck your key. When you get the records back,
 // grouped into pages, you split your page based on the keys in those records.
 //
-// There must be at least two rectangles in the collection.
+// There must be at least two rectangles in the collection. Below we provide
+// a quadratic and linear cost split.
 //
-// Determine which pair would require the biggest rectangle to enclose them.
+
+function getLinearSeeds (rectified) {
+    var a, b
+    var j = 0
+    var seedX1, seedX2, seedY1, seedY2
+    var x = [rectified[j].record.x]
+    var y = [rectified[j].record.y]
+    var normalizedX, normalizedY
+
+
+    seedX1 = seedX2 = seedY1 = seedY2 = 0
+
+    for (j = 1; j < rectified.length; j++) {
+        x.push(rectified[j].record.x)
+        y.push(rectified[j].record.y)
+
+        if (rectified[seedX1].record.x < rectified[j].record.x) {
+            seedX1 = j
+        }
+
+        if (rectified[seedX2].record.x > rectified[j].record.x) {
+            seedX2 = j
+        }
+
+        if (rectified[seedY1].record.y < rectified[j].record.y) {
+            seedY1 = j
+        }
+
+        if (rectified[seedY2].record.y > rectified[j].record.y) {
+            seedY2 = j
+        }
+    }
+
+    // Get the normalized seperations
+    x.sort()
+    a = Math.abs(x.pop() - x.shift())
+    b = Math.abs(x.pop() - x.shift())
+    normalizedX = (b/a)
+
+    y.sort()
+    a = Math.abs(y.pop() - y.shift())
+    b = Math.abs(y.pop() - y.shift())
+    normalizedY = (b/a)
+
+    // Return seeds
+    if (normalizedX > normalizedY) {
+        return [ seedX1, seedX2 ]
+    } else {
+        return [ seedY1, seedY2 ]
+    }
+
+}
+
+
+function distToGroupLin (rectified, left, right) {
+    // Using pickNext(), give each entry to the group that would have to grow
+    // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
+    // rectified > either one
+    var i, leftDiff, rightDiff, temp
+
+    while (rectified.length) {
+        temp = rectified.pop()
+        leftDiff = left.rect.combine(temp.rect).area - left.rect.area
+        rightDiff = right.rect.combine(temp.rect).area - right.rect.area
+        if (leftDiff > rightDiff) {
+            right.rect = right.rect.combine(temp.rect)
+            right.records.push(temp.record)
+        } else if (rightDiff > leftDiff) {
+            left.rect = left.rect.combine(temp.rect)
+            left.records.push(temp.record)
+        } else {
+            // do you have have to grow the rectangles here? Yes!
+            //place in group with smallest area
+            if (left.rect.area > right.rect.area) {
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
+            }
+            else if (right.rect.area > left.rect.area) {
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
+            }
+            //if tie, place in group with fewest records
+            else if (left.records.length > right.records.length) {
+                right.rect = right.rect.combine(temp.rect)
+                right.records.push(temp.record)
+            }
+            else {
+                left.rect = left.rect.combine(temp.rect)
+                left.records.push(temp.record)
+                //if tie, does not matter
+            }
+        }
+    }
+
+    return [ left, right ]
+}
+
+
+// The quadratic split determines which pair would require the biggest
+// rectangle to enclose them.
 
 function getQuadraticSeeds (rectified) {
     var candidate = new Rectangle(0, 0, 0, 0)
@@ -31,7 +131,7 @@ function getQuadraticSeeds (rectified) {
     return [ seed1, seed2 ]
 }
 
-function distToGroup (rectified, left, right) {
+function distToGroupQuad (rectified, left, right) {
     // Using pickNext(), give each entry to the group that would have to grow
     // _least_ to accomodate it If groups tie, choose by: smallest area > fewest
     // rectified > either one
@@ -74,8 +174,6 @@ function distToGroup (rectified, left, right) {
     return [ left, right ]
 
     function pickNext () {
-        // remember this one: gqj
-
         // Takes all records not yet grouped find the amount both groups would
         // have to grow to include that entry, return entry with max diff
         // between group growths.
@@ -113,11 +211,6 @@ Rectangle.prototype.combine = function (other) { // :: Rectangle -> Rectangle
     ok(other instanceof Rectangle, 'other instanceof Rectangle')
     var x = Math.min(this.x, other.x)
     var y = Math.max(this.y, other.y)
-
-    // The following lines will not work, since we are
-    // not receiving rectangles. Will need to recalculate
-    // bottom and right.
-    //
     var bottom = Math.min(this.bottom, other.bottom)
     var right = Math.max(this.right, other.right)
     return new Rectangle(x, y, bottom, right)
@@ -147,7 +240,7 @@ Rectangle.prototype.diagonal = function () { // :: -> Int
   return Math.sqrt(((this.width * this.width) + (this.height * this.height)))
 }
 
-exports.partition = function (records) {
+exports.quadraticPartition = function (records) {
     var rectified = records.map(function (record) {
         var x = +(record.x)
         var y = +(record.y)
@@ -168,7 +261,33 @@ exports.partition = function (records) {
         var left = { rect: rectified[seeds[0]].rect }
         left.records = [ rectified.splice(seeds[0], 1)[0].record ]
 
-        return distToGroup(rectified, left, right)
+        return distToGroupQuad(rectified, left, right)
+    }
+
+}
+
+exports.linearPartition = function (records) {
+    var rectified = records.map(function (record) {
+        var x = +(record.x)
+        var y = +(record.y)
+        return {
+            rect: new Rectangle(x, y, y, x),
+            record: record
+        }
+    })
+
+    return linearSplit(rectified)
+
+    function linearSplit (rectified) {
+        var seeds = getLinearSeeds(rectified)
+        seeds.sort()
+        var right = { rect: rectified[seeds[1]].rect }
+        right.records = [ rectified.splice(seeds[1], 1)[0].record ]
+
+        var left = { rect: rectified[seeds[0]].rect }
+        left.records = [ rectified.splice(seeds[0], 1)[0].record ]
+
+        return distToGroupLin(rectified, left, right)
     }
 
 }
