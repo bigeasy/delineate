@@ -14,16 +14,15 @@ var ok = require('assert').ok
 
 function getLinearSeeds (rectified) {
     var a, b
-    var j = 0
     var seedX1, seedX2, seedY1, seedY2
-    var x = [rectified[j].record.x]
-    var y = [rectified[j].record.y]
+    var x = [rectified[0].record.x]
+    var y = [rectified[0].record.y]
     var normalizedX, normalizedY
 
 
     seedX1 = seedX2 = seedY1 = seedY2 = 0
 
-    for (j = 1; j < rectified.length; j++) {
+    for (var j = 0; j < rectified.length; j++) {
         x.push(rectified[j].record.x)
         y.push(rectified[j].record.y)
 
