@@ -1,0 +1,3 @@
+https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf
+https://www.cs.umd.edu/grad/scholarlypapers/papers/Hayden,%20Christopher%20M.pdf
+http://www.gitta.info/SpatPartitio/en/text/SpatPartitio.pdf
