@@ -30,6 +30,6 @@
                         "url": "http://github.com/bigeasy/bifurcate/raw/master/LICENSE"
     }],
     "scripts": {
-        "test": "proof t/*/*.t.js"
+        "test": "proof test/*.t.js"
     }
 }
