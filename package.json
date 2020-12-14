@@ -1,18 +1,18 @@
 {
-    "name":             "delineate",
+    "name":             "bifurcate",
     "version":          "0.0.1",
     "author":           "Alan Gutierrez <alan@prettyrobots.com>",
-    "description":      "An R-Tree partition algorithm.",
+    "description":      "A collection of alternative R-Tree partition algorithms.",
     "keywords":
     [
                         "btree", "database", "json", "b-tree", "r-tree", "spatial"
     ],
-    "homepage":         "https://github.com/bigeasy/delineate",
-    "bugs":             "https://github.com/bigeasy/delineate/issues",
+    "homepage":         "https://github.com/bigeasy/bifurcate",
+    "bugs":             "https://github.com/bigeasy/bifurcate/issues",
     "repository":
     {
                         "type": "git",
-                        "url": "http://github.com/bigeasy/delineate.git"
+                        "url": "bigeasy/bifurcate"
     },
     "contributors":
     [{
@@ -22,14 +22,14 @@
     }],
     "devDependencies":
     {
-                        "proof": "1.0.2"
+                        "proof": "^9.0.2"
     },
     "licenses":
     [{
                         "type": "MIT",
-                        "url": "http://github.com/bigeasy/delineate/raw/master/LICENSE"
+                        "url": "http://github.com/bigeasy/bifurcate/raw/master/LICENSE"
     }],
     "scripts": {
-        "test": "proof platform win32 && proof test */*/*.t.js || t/test"
+        "test": "proof test/*.t.js"
     }
 }

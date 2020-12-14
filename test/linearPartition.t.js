@@ -5,10 +5,10 @@ var path = require('path')
 
 require('proof')(1, function (step, equal, say) {
 
-    var partition = require('../..').linearPartition
+    var partition = require('..').linearPartition
 
     step(function () {
-        fs.readFile(path.join(__dirname, '..', 'places.txt'), 'utf8', step())
+        fs.readFile(path.join(__dirname, 'places.txt'), 'utf8', step())
     }, function (body) {
         var places = body.split(/\n/)
         var records = []
